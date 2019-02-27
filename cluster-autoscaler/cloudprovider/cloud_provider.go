@@ -140,6 +140,19 @@ type NodeGroup interface {
 	// Autoprovisioned returns true if the node group is autoprovisioned. An autoprovisioned group
 	// was created by CA and can be deleted when scaled to 0.
 	Autoprovisioned() bool
+
+	// Status returns the current health status information of this node group.
+	Status() *NodeGroupStatus
+}
+
+// NodeGroupStatus contains the current health status of a node group.
+type NodeGroupStatus struct {
+	// Healthy returns if the node group is currently healthy.
+	Healthy bool
+
+	// Error returns the current status error if set, should be set
+	// when the node group is unhealthy.
+	Error *string
 }
 
 // Instance represents a cloud-provider node. The node does not necessarily map to k8s node

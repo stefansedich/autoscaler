@@ -31,6 +31,7 @@ type autoScaling interface {
 	DescribeTagsPages(input *autoscaling.DescribeTagsInput, fn func(*autoscaling.DescribeTagsOutput, bool) bool) error
 	SetDesiredCapacity(input *autoscaling.SetDesiredCapacityInput) (*autoscaling.SetDesiredCapacityOutput, error)
 	TerminateInstanceInAutoScalingGroup(input *autoscaling.TerminateInstanceInAutoScalingGroupInput) (*autoscaling.TerminateInstanceInAutoScalingGroupOutput, error)
+	DescribeScalingActivities(input *autoscaling.DescribeScalingActivitiesInput) (*autoscaling.DescribeScalingActivitiesOutput, error)
 }
 
 // autoScalingWrapper provides several utility methods over the auto-scaling service provided by AWS SDK
@@ -136,4 +137,22 @@ func (m *autoScalingWrapper) getAutoscalingGroupNamesByTags(kvs map[string]strin
 	}
 
 	return asgNames, nil
+}
+
+func (m *autoScalingWrapper) getMostRecentAutoscalingGroupActivity(asgName string) (*autoscaling.Activity, error) {
+	input := &autoscaling.DescribeScalingActivitiesInput{
+		AutoScalingGroupName: aws.String(asgName),
+		MaxRecords:           aws.Int64(1),
+	}
+
+	output, err := m.DescribeScalingActivities(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(output.Activities) == 0 {
+		return nil, nil
+	}
+
+	return output.Activities[0], nil
 }

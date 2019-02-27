@@ -299,6 +299,7 @@ func (csr *ClusterStateRegistry) UpdateNodes(nodes []*apiv1.Node, nodeInfosForGr
 	csr.updateAcceptableRanges(targetSizes)
 	csr.updateScaleRequests(currentTime)
 	csr.handleOutOfResourcesErrors(currentTime)
+	csr.handleUnhealthyNodeGroups(currentTime)
 	//  recalculate acceptable ranges after removing timed out requests
 	csr.updateAcceptableRanges(targetSizes)
 	csr.updateIncorrectNodeGroupSizes(currentTime)
@@ -1014,6 +1015,56 @@ func (csr *ClusterStateRegistry) handleOutOfResourcesErrorsForNodeGroup(
 			csr.registerOrUpdateScaleUpNoLock(nodeGroup, -len(unseenInstanceIds), currentTime)
 			csr.registerFailedScaleUpNoLock(nodeGroup, metrics.FailedScaleUpReason(errorCode), cloudprovider.OutOfResourcesErrorClass, errorCode, currentTime)
 		}
+	}
+}
+
+func (csr *ClusterStateRegistry) handleUnhealthyNodeGroups(currentTime time.Time) {
+	nodeGroups := csr.cloudProvider.NodeGroups()
+
+	for _, nodeGroup := range nodeGroups {
+		csr.handleUnhealthyNodeGroup(
+			nodeGroup,
+			csr.cloudProviderNodeInstances[nodeGroup.Id()],
+			currentTime)
+	}
+}
+
+func (csr *ClusterStateRegistry) handleUnhealthyNodeGroup(
+	nodeGroup cloudprovider.NodeGroup,
+	instances []cloudprovider.Instance,
+	currentTime time.Time) {
+	status := nodeGroup.Status()
+	if status == nil || status.Healthy {
+		return
+	}
+
+	currentSize := len(instances)
+	targetSize, err := nodeGroup.TargetSize()
+	if err != nil {
+		klog.Errorf("Failed to retreive target size for unhealthy node group %v", nodeGroup.Id())
+		return
+	}
+
+	pendingInstances := targetSize - currentSize
+	if pendingInstances > 0 {
+		errorCode := "NODEGROUP_UNHEALTHY"
+
+		klog.V(1).Infof("Failed adding %v nodes to unhealthy group %v due to %v", pendingInstances, nodeGroup.Id(), status.Error)
+		csr.logRecorder.Eventf(
+			apiv1.EventTypeWarning,
+			"ScaleUpFailed",
+			"Failed adding %v nodes to unhealthy group %v due to %v",
+			pendingInstances,
+			nodeGroup.Id(),
+			status.Error)
+
+		err := nodeGroup.DecreaseTargetSize(-(pendingInstances))
+		if err != nil {
+			klog.Errorf("Failed to decrease target size for unhealhty node group %v due to %v", nodeGroup.Id(), err)
+		}
+
+		csr.registerOrUpdateScaleUpNoLock(nodeGroup, -(pendingInstances), currentTime)
+		csr.registerFailedScaleUpNoLock(nodeGroup, metrics.FailedScaleUpReason(errorCode), cloudprovider.OutOfResourcesErrorClass, errorCode, currentTime)
 	}
 }
 

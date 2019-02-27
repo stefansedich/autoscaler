@@ -269,6 +269,11 @@ func (nodeGroup *NodeGroup) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (nodeGroup *NodeGroup) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 func buildNodeGroup(value string, kubemarkController *kubemark.KubemarkController) (*NodeGroup, error) {
 	spec, err := dynamic.SpecFromString(value, true)
 	if err != nil {

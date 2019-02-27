@@ -57,6 +57,11 @@ func (a *AutoScalingMock) TerminateInstanceInAutoScalingGroup(input *autoscaling
 	return args.Get(0).(*autoscaling.TerminateInstanceInAutoScalingGroupOutput), nil
 }
 
+func (a *AutoScalingMock) DescribeScalingActivities(input *autoscaling.DescribeScalingActivitiesInput) (*autoscaling.DescribeScalingActivitiesOutput, error) {
+	args := a.Called(input)
+	return args.Get(0).(*autoscaling.DescribeScalingActivitiesOutput), nil
+}
+
 type EC2Mock struct {
 	mock.Mock
 }

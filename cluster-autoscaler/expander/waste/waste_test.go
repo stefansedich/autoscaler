@@ -52,8 +52,9 @@ func (f *FakeNodeGroup) Exist() bool { return true }
 func (f *FakeNodeGroup) Create() (cloudprovider.NodeGroup, error) {
 	return nil, cloudprovider.ErrAlreadyExist
 }
-func (f *FakeNodeGroup) Delete() error         { return cloudprovider.ErrNotImplemented }
-func (f *FakeNodeGroup) Autoprovisioned() bool { return false }
+func (f *FakeNodeGroup) Delete() error                          { return cloudprovider.ErrNotImplemented }
+func (f *FakeNodeGroup) Autoprovisioned() bool                  { return false }
+func (f *FakeNodeGroup) Status() *cloudprovider.NodeGroupStatus { return nil }
 
 func makeNodeInfo(cpu int64, memory int64, pods int64) *schedulernodeinfo.NodeInfo {
 	node := &apiv1.Node{

@@ -404,6 +404,11 @@ func (mig *GkeMig) Autoprovisioned() bool {
 	return mig.autoprovisioned
 }
 
+// Status returns the current health status information of this node group.
+func (mig *GkeMig) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // TemplateNodeInfo returns a node template for this node group.
 func (mig *GkeMig) TemplateNodeInfo() (*schedulernodeinfo.NodeInfo, error) {
 	node, err := mig.gkeManager.GetMigTemplateNode(mig)

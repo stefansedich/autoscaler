@@ -111,6 +111,11 @@ func (as *AgentPool) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (as *AgentPool) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // MaxSize returns maximum size of the node group.
 func (as *AgentPool) MaxSize() int {
 	return as.maxSize

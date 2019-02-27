@@ -191,6 +191,11 @@ func (ng *AwsNodeGroup) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (ng *AwsNodeGroup) Status() *cloudprovider.NodeGroupStatus {
+	return ng.asg.status
+}
+
 // Delete deletes the node group on the cloud provider side.
 // This will be executed only for autoprovisioned node groups, once their size drops to 0.
 func (ng *AwsNodeGroup) Delete() error {

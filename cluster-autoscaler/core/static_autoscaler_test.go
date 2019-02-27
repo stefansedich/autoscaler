@@ -855,6 +855,7 @@ func TestStaticAutoscalerOutOfResources(t *testing.T) {
 	// Three nodes with out-of-resources errors
 	nodeGroupA.On("Exist").Return(true)
 	nodeGroupA.On("Autoprovisioned").Return(false)
+	nodeGroupA.On("Status").Return(nil)
 	nodeGroupA.On("TargetSize").Return(5, nil)
 	nodeGroupA.On("Id").Return("A")
 	nodeGroupA.On("DeleteNodes", mock.Anything).Return(nil)
@@ -905,6 +906,7 @@ func TestStaticAutoscalerOutOfResources(t *testing.T) {
 
 	nodeGroupB.On("Exist").Return(true)
 	nodeGroupB.On("Autoprovisioned").Return(false)
+	nodeGroupB.On("Status").Return(nil)
 	nodeGroupB.On("TargetSize").Return(5, nil)
 	nodeGroupB.On("Id").Return("B")
 	nodeGroupB.On("DeleteNodes", mock.Anything).Return(nil)

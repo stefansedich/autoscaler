@@ -95,6 +95,11 @@ func (scaleSet *ScaleSet) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (scaleSet *ScaleSet) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // MaxSize returns maximum size of the node group.
 func (scaleSet *ScaleSet) MaxSize() int {
 	return scaleSet.maxSize

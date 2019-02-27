@@ -502,3 +502,8 @@ func (agentPool *ContainerServiceAgentPool) Delete() error {
 func (agentPool *ContainerServiceAgentPool) Autoprovisioned() bool {
 	return false
 }
+
+// Status returns the current health status information of this node group.
+func (agentPool *ContainerServiceAgentPool) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}

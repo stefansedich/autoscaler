@@ -302,6 +302,11 @@ func (mig *gceMig) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (mig *gceMig) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // TemplateNodeInfo returns a node template for this node group.
 func (mig *gceMig) TemplateNodeInfo() (*schedulernodeinfo.NodeInfo, error) {
 	node, err := mig.gceManager.GetMigTemplateNode(mig)

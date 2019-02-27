@@ -374,6 +374,11 @@ func (tng *TestNodeGroup) Autoprovisioned() bool {
 	return tng.autoprovisioned
 }
 
+// Status returns the current health status information of this node group.
+func (tng *TestNodeGroup) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // TemplateNodeInfo returns a node template for this node group.
 func (tng *TestNodeGroup) TemplateNodeInfo() (*schedulernodeinfo.NodeInfo, error) {
 	if tng.cloudProvider.machineTemplates == nil {

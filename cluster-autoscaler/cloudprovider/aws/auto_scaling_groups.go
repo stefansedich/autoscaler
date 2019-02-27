@@ -50,6 +50,7 @@ type asg struct {
 	minSize int
 	maxSize int
 	curSize int
+	status  *cloudprovider.NodeGroupStatus
 
 	AvailabilityZones       []string
 	LaunchTemplateName      string
@@ -109,6 +110,7 @@ func (m *asgCache) register(asg *asg) *asg {
 			}
 
 			existing.curSize = asg.curSize
+			existing.status = asg.status
 
 			// Those information are mainly required to create templates when scaling
 			// from zero
@@ -373,6 +375,7 @@ func (m *asgCache) buildAsgFromAWS(g *autoscaling.Group) (*asg, error) {
 		AwsRef:  AwsRef{Name: spec.Name},
 		minSize: spec.MinSize,
 		maxSize: spec.MaxSize,
+		status:  &cloudprovider.NodeGroupStatus{Healthy: true},
 
 		curSize:                 int(aws.Int64Value(g.DesiredCapacity)),
 		AvailabilityZones:       aws.StringValueSlice(g.AvailabilityZones),
@@ -380,6 +383,18 @@ func (m *asgCache) buildAsgFromAWS(g *autoscaling.Group) (*asg, error) {
 		LaunchTemplateName:      launchTemplateName,
 		LaunchTemplateVersion:   launchTemplateVersion,
 		Tags:                    g.Tags,
+	}
+
+	if len(g.Instances) < asg.curSize {
+		activity, err := m.service.getMostRecentAutoscalingGroupActivity(spec.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		if activity != nil && *activity.StatusCode == "Failed" {
+			asg.status.Healthy = false
+			asg.status.Error = activity.StatusMessage
+		}
 	}
 
 	return asg, nil

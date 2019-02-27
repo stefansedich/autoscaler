@@ -40,6 +40,22 @@ func (_m *NodeGroup) Autoprovisioned() bool {
 	return r0
 }
 
+// Status provides a mock function with given fields:
+func (_m *NodeGroup) Status() *cloudprovider.NodeGroupStatus {
+	ret := _m.Called()
+
+	var r0 *cloudprovider.NodeGroupStatus
+	if rf, ok := ret.Get(0).(func() *cloudprovider.NodeGroupStatus); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*cloudprovider.NodeGroupStatus)
+		}
+	}
+
+	return r0
+}
+
 // Create provides a mock function with given fields:
 func (_m *NodeGroup) Create() (cloudprovider.NodeGroup, error) {
 	ret := _m.Called()

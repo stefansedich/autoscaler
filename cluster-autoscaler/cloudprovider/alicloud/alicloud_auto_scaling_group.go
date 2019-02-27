@@ -206,6 +206,11 @@ func (asg *Asg) Autoprovisioned() bool {
 	return false
 }
 
+// Status returns the current health status information of this node group.
+func (asg *Asg) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
+
 // Delete deletes the node group on the cloud provider side.
 // This will be executed only for autoprovisioned node groups, once their size drops to 0.
 func (asg *Asg) Delete() error {

@@ -347,3 +347,8 @@ func (asg *Asg) Delete() error {
 func (asg *Asg) Autoprovisioned() bool {
 	return false
 }
+
+// Status returns the current health status information of this node group.
+func (asg *Asg) Status() *cloudprovider.NodeGroupStatus {
+	return nil
+}
